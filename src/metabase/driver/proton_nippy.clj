@@ -1,4 +1,4 @@
-(ns metabase.driver.clickhouse-nippy
+(ns metabase.driver.proton-nippy
   (:require [taoensso.nippy :as nippy])
   (:import  [java.io DataInput DataOutput]))
 
