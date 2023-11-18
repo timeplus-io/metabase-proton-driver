@@ -5,7 +5,6 @@
             [honey.sql :as sql]
             [java-time.api :as t]
             [metabase [util :as u]]
-            [metabase.driver.proton-nippy]
             [metabase.driver.sql-jdbc [execute :as sql-jdbc.execute]]
             [metabase.driver.sql.query-processor :as sql.qp :refer [add-interval-honeysql-form]]
             [metabase.driver.sql.util.unprepare :as unprepare]
@@ -407,7 +406,7 @@
           (Arrays/toString inner)
           ;; Complex types
           :else
-          (.asString (protonArrayValue/of inner)))))))
+          (.asString (ProtonArrayValue/of inner)))))))
 
 (defn- ip-column->string
   [^ResultSet rs ^Integer i]

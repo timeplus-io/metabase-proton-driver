@@ -4,7 +4,6 @@
             [clojure.string :as str]
             [metabase.driver :as driver]
             [metabase.driver.proton-introspection]
-            [metabase.driver.proton-nippy]
             [metabase.driver.proton-qp]
             [metabase.driver.ddl.interface :as ddl.i]
             [metabase.driver.sql :as driver.sql]
