@@ -1,48 +1,23 @@
 info:
-  name: Metabase ClickHouse Driver
-  version: 1.2.3
-  description: Allows Metabase to connect to ClickHouse databases.
+  name: Metabase Proton Driver
+  version: 0.0.1
+  description: Allows Metabase to connect to Timeplus Proton databases
 contact-info:
-  name: ClickHouse
-  address: https://github.com/ClickHouse/metabase-clickhouse-driver
+  name: Jove Zhong
+  address: jove@timeplus.com
 driver:
-  name: clickhouse
-  display-name: ClickHouse
+  name: proton
+  display-name: Timeplus Proton
   lazy-load: true
   parent: sql-jdbc
   connection-properties:
-    - host
+    - name: host
+      default: "localhost"
     - merge:
         - port
-        - default: 8123
-    - user
-    - password
-    - name: dbname
-      display-name: Databases
-      placeholder: default
-      helper-text: "To specify multiple databases, separate them by the space symbol. For example: default data logs"
-    - name: scan-all-databases
-      display-name: Scan all databases
-      type: boolean
-      default: false
-      description: Scan all tables from all available ClickHouse databases except the system ones.
-
-    - ssl
-    - ssh-tunnel
-    - advanced-options-start
-    - name: use-no-proxy
-      display-name: Disable system wide proxy settings
-      default: false
-      type: boolean
-      visible-if:
-        advanced-options: true
-    - merge:
-        - additional-options
-        - placeholder: "connection_timeout=1000&max_rows_to_group_by=42"
-    - default-advanced-options
-  connection-properties-include-tunnel-config: true
+        - default: 3218
 init:
   - step: load-namespace
-    namespace: metabase.driver.clickhouse
+    namespace: metabase.driver.proton
   - step: register-jdbc-driver
-    class: com.clickhouse.jdbc.ClickHouseDriver
+    class: com.timeplus.proton.jdbc.ProtonDriver

@@ -1,146 +1,69 @@
-<p align="center" style="font-size:300%">
-<img src="https://www.metabase.com/images/logo.svg" width="200px" align="center">
-<img src=".static/clickhouse.svg" width="180px" align="center">
-<h1 align="center">ClickHouse driver for Metabase</h1>
-</p>
-<br/>
-<p align="center">
-<a href="https://github.com/enqueue/metabase-clickhouse-driver/actions/workflows/check.yml">
-<img src="https://github.com/enqueue/metabase-clickhouse-driver/actions/workflows/check.yml/badge.svg?branch=master">
-</a>
-<a href="https://github.com/enqueue/metabase-clickhouse-driver/releases">
-<img src="https://img.shields.io/github/release/enqueue/metabase-clickhouse-driver.svg?label=latest%20release">
-</a>
-<a href="https://raw.githubusercontent.com/enqueue/metabase-clickhouse-driver/master/LICENSE">
-<img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
-</a>
-</p>
+# Proton driver for Metabase
 
-## About
+This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-driver with necessary revisions to better fit streaming processing and Proton.
 
-[ClickHouse](https://clickhouse.com) ([GitHub](https://github.com/ClickHouse/ClickHouse)) database driver for the [Metabase](https://metabase.com) ([GitHub](https://github.com/metabase/metabase)) business intelligence front-end.
+## Add database
 
-## Installation
+1. Once you've started up Metabase, open http://localhost:3000 , go to "Admin settings" (top-right), then "Databases" tab and add a database and select "Timieplus Proton".
+2. You'll need to provide the Host/Port. Default localhost and 3218 just work.
 
-### Run using Metabase Jar
+## Run Query
+Please note, by default Proton's query behavior is streaming SQL, looking for new data in the future and never ends. This can be considered as hang for Metabase. So please use `select .. from .. LIMIT 100` to stop the query at 100 events. Or use a historical query, such as `select .. from table(car_live_data)..`
 
-1. Download a fairly recent Metabase binary release (jar file) from the [Metabase distribution page](https://metabase.com/start/jar.html).
-2. Download the ClickHouse driver jar from this repository's [Releases](https://github.com/enqueue/metabase-clickhouse-driver/releases) page
-3. Create a directory and copy the `metabase.jar` to it.
-4. In that directory create a sub-directory called `plugins`.
-5. Copy the ClickHouse driver jar to the `plugins` directory.
-6. Make sure you are the in the directory where your `metabase.jar` lives.
-7. Run `MB_PLUGINS_DIR=./plugins; java -jar metabase.jar`.
+### Build from source
+The build process is largely based on https://github.com/databendcloud/metabase-databend-driver. (IMHO, Leiningen provides much better compiling error message than the built-in `clojure -X:build:drivers:build/driver`)
 
-For example [(using Metabase v0.47.2 and ClickHouse driver 1.2.2)](#choosing-the-right-version):
+### Prerequisites
 
-```bash
-export METABASE_VERSION=v0.47.2
-export METABASE_CLICKHOUSE_DRIVER_VERSION=1.2.2
+- [Leiningen](https://leiningen.org/)
 
-mkdir -p mb/plugins && cd mb
-curl -o metabase.jar https://downloads.metabase.com/$METABASE_VERSION/metabase.jar
-curl -L -o plugins/ch.jar https://github.com/ClickHouse/metabase-clickhouse-driver/releases/download/$METABASE_CLICKHOUSE_DRIVER_VERSION/clickhouse.metabase-driver.jar
-MB_PLUGINS_DIR=./plugins; java -jar metabase.jar
-```
+## Steps
 
-### Run as a Docker container
+1. Clone and build metabase dependency jar.
 
-Alternatively, if you don't want to run Metabase Jar, you can use a Docker image:
+   ```shell
+   git clone https://github.com/metabase/metabase
+   cd metabase
+   clojure -X:deps prep
+   cd modules/drivers
+   clojure -X:deps prep
+   cd ../..
+   ./bin/build.sh
+   ```
 
-```bash
-export METABASE_DOCKER_VERSION=v0.47.2
-export METABASE_CLICKHOUSE_DRIVER_VERSION=1.2.2
+2. Clone metabase-proton-driver repo
 
-mkdir -p mb/plugins && cd mb
-curl -L -o plugins/ch.jar https://github.com/ClickHouse/metabase-clickhouse-driver/releases/download/$METABASE_CLICKHOUSE_DRIVER_VERSION/clickhouse.metabase-driver.jar
-docker run -d -p 3000:3000 \
-  --mount type=bind,source=$PWD/plugins/ch.jar,destination=/plugins/clickhouse.jar \
-  metabase/metabase:$METABASE_DOCKER_VERSION
-```
+   ```shell
+   cd modules/drivers
+   git clone https://github.com/timeplus-io/metabase-proton-driver
+   ```
 
-## Choosing the Right Version
+3. Prepare metabase dependencies
 
-| Metabase Release | Driver Version |
-| ---------------- | -------------- |
-| 0.33.x           | 0.6            |
-| 0.34.x           | 0.7.0          |
-| 0.35.x           | 0.7.1          |
-| 0.37.3           | 0.7.3          |
-| 0.38.1+          | 0.7.5          |
-| 0.41.2           | 0.8.0          |
-| 0.41.3.1         | 0.8.1          |
-| 0.42.x           | 0.8.1          |
-| 0.44.x           | 0.9.1          |
-| 0.45.x           | 1.1.0          |
-| 0.46.x           | 1.1.7          |
-| 0.47.x           | 1.2.3          |
+   ```shell
+   cp ../../target/uberjar/metabase.jar metabase-proton-driver/
+   cd metabase-proton-driver
+   mkdir repo
+   lein pom
+   mvn deploy:deploy-file -Durl=file:repo -DgroupId=metabase-core -DartifactId=metabase-core -Dversion=1.40 -Dpackaging=jar -Dfile=metabase.jar
+   ```
 
-## Creating a Metabase Docker image with ClickHouse driver
+4. Build the jar
 
-You can use a convenience script `build_docker_image.sh`, which takes three arguments: Metabase version, ClickHouse driver version, and the desired final Docker image tag.
+   ```shell
+   LEIN_SNAPSHOTS_IN_RELEASE=true DEBUG=1 lein uberjar
+   ```
 
-```bash
-./build_docker_image.sh v0.47.2 1.2.2 my-metabase-with-clickhouse:v0.0.1
-```
+5. Let's assume we download `metabase.jar` from the [Metabase jar](https://www.metabase.com/docs/latest/operations-guide/running-the-metabase-jar-file.html) to `~/metabase/` and we built the project above. Copy the built jar(proton.metabase-driver.jar) to the Metabase plugins directly and run Metabase from there!
 
-where `v0.47.2` is Metabase version, `1.2.2` is ClickHouse driver version, and `my-metabase-with-clickhouse:v0.0.1` being the tag.
+   ```shell
+   cd ~/metabase/
+   java -jar metabase.jar
+   ```
 
-Then you should be able to run it:
-
-```bash
-docker run -d -p 3000:3000 --name my-metabase my-metabase-with-clickhouse:v0.0.1
-```
-
-or use it with Docker compose, for example:
-
-```yaml
-version: '3.8'
-services:
-  clickhouse:
-    image: 'clickhouse/clickhouse-server:23.8-alpine'
-    container_name: 'metabase-clickhouse-server'
-    ports:
-      - '8123:8123'
-      - '9000:9000'
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
-  metabase:
-    image: 'my-metabase-with-clickhouse:v0.0.1'
-    container_name: 'metabase-with-clickhouse'
-    ports:
-      - '3000:3000'
-```
-
-## Using certificates
-
-In the "Advanced options", add the following to the "Additional JDBC connection string options" input:
+You should see a message on startup similar to:
 
 ```
-sslrootcert=/path/to/ca.crt
+2023-11-18 09:55:37,102 DEBUG plugins.lazy-loaded-driver :: Registering lazy loading driver :proton...
+2023-11-18 09:55:37,102 INFO driver.impl :: Registered driver :proton (parents: [:sql-jdbc]) 🚚
 ```
-
-where `/path/to/ca.crt` is the absolute path to the server CA on the Metabase host or Docker container (depends on your deployment).
-
-Make sure that you tick "Use a secure connection (SSL)" as well.
-
-## Operations
-
-The driver should work fine for many use cases. Please consider the following items when running a Metabase instance with this driver:
-
-* Create a dedicated user for Metabase, whose profile has `readonly` set to 2.
-* Consider running the Metabase instance in the same time zone as your ClickHouse database; the more time zones involved the more issues.
-* Compare the results of the queries with the results returned by `clickhouse-client`.
-* Metabase is a good tool for organizing questions, dashboards etc. and to give non-technical users a good way to explore the data and share their results. The driver cannot support all the cool special features of ClickHouse, e.g. array functions. You are free to use native queries, of course.
-
-
-## Known limitations
-
-* As the underlying JDBC driver version does not support columns with `AggregateFunction` type, these columns are excluded from the table metadata and data browser result sets to prevent sync or data browsing errors.
-* If the past month/week/quarter/year filter over a DateTime64 column is not working as intended, this is likely due to a [type conversion issue](https://github.com/ClickHouse/ClickHouse/pull/50280). See [this report](https://github.com/ClickHouse/metabase-clickhouse-driver/issues/164) for more details. This issue was resolved as of ClickHouse 23.5.
-
-## Contributing
-
-Check out our [contributing guide](./CONTRIBUTING.md).

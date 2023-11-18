@@ -21,13 +21,13 @@ assignees: ''
 
 ### Configuration
 #### Environment
-* metabase-clickhouse-driver version:
-* metabase-clickhouse-driver configuration:
+* metabase-proton-driver version:
+* metabase-proton-driver configuration:
 * Metabase version:
 * OS:
 
-#### ClickHouse server
-* ClickHouse Server version:
-* ClickHouse Server non-default settings, if any:
-* `CREATE TABLE` statements for tables involved:
-* Sample data for all these tables, use [clickhouse-obfuscator](https://github.com/ClickHouse/ClickHouse/blob/master/programs/obfuscator/Obfuscator.cpp#L42-L80) if necessary
+#### Proton server
+* Proton Server version:
+* Proton Server non-default settings, if any:
+* `CREATE STREAM` statements:
+* Sample data
