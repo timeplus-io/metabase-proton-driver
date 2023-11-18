@@ -1,19 +1,18 @@
 info:
   name: Metabase Proton Driver
-  version: 0.0.1-SNAPSHOT
+  version: 0.0.1
   description: Allows Metabase to connect to Timeplus Proton databases
 contact-info:
   name: Jove Zhong
   address: jove@timeplus.com
-dependencies:  
-  - class: com.timeplus.proton.jdbc.ProtonDriver
 driver:
   name: proton
-  display-name: Metabase Proton Driver
+  display-name: Timeplus Proton
   lazy-load: true
   parent: sql-jdbc
   connection-properties:
-    - host
+    - name: host
+      default: "localhost"
     - merge:
         - port
         - default: 3218
