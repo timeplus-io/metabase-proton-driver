@@ -41,7 +41,7 @@ This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-dri
    cd metabase-proton-driver
    mkdir repo
    lein pom
-   mvn deploy:deploy-file -Durl=file:repo -DgroupId=com.timeplus -DartifactId=metabase-core -Dversion=1.40 -Dpackaging=jar -Dfile=metabase.jar
+   mvn deploy:deploy-file -Durl=file:repo -DgroupId=metabase-core -DartifactId=metabase-core -Dversion=1.40 -Dpackaging=jar -Dfile=metabase.jar
    ```
 
 4. Build the jar
