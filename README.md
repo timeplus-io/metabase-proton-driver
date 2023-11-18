@@ -13,6 +13,7 @@ This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-dri
 
 - [Leiningen](https://leiningen.org/)
 
+## Steps
 
 1. Clone and build metabase dependency jar.
 
@@ -39,7 +40,8 @@ This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-dri
    cp ../../target/uberjar/metabase.jar metabase-proton-driver/
    cd metabase-proton-driver
    mkdir repo
-   mvn deploy:deploy-file -Durl=file:repo -DgroupId=com.timeplus.proton -DartifactId=metabase-core -Dversion=1.40 -Dpackaging=jar -Dfile=metabase.jar
+   lein pom
+   mvn deploy:deploy-file -Durl=file:repo -DgroupId=com.timeplus -DartifactId=metabase-core -Dversion=1.40 -Dpackaging=jar -Dfile=metabase.jar
    ```
 
 4. Build the jar

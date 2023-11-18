@@ -1,4 +1,7 @@
 (defproject metabase/proton-driver "0.0.1"
+  :description "Timeplus Proton driver for Metabase"
+  :license "Apache License 2.0"
+  :url "http://github.com/timeplus-io/metabase-proton-driver"
   :min-lein-version "2.5.0"
 
   :dependencies
