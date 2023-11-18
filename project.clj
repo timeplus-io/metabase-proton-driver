@@ -8,6 +8,12 @@
   [[com.timeplus/proton-jdbc "0.4.0"]
    [clojure.java-time "0.3.2"]
   ]
+  
+  :repositories [
+                ["project" "file:repo"]]
+  :aliases
+  {"test"       ["with-profile" "test"]}
+
 
   :profiles
   {:provided
