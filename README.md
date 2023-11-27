@@ -5,7 +5,7 @@ This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-dri
 ## Add database
 
 1. Once you've started up Metabase, open http://localhost:3000 , go to "Admin settings" (top-right), then "Databases" tab and add a database and select "Timeplus Proton".
-2. You'll need to provide the Host/Port. Default localhost and 3218 just work.
+2. You'll need to provide the Host/Port. Default localhost and 8123 just work.
 
 ## Run Query
 Please note, by default Proton's query behavior is streaming SQL, looking for new data in the future and never ends. This can be considered as hang for Metabase. So please use `select .. from .. LIMIT 100` to stop the query at 100 events. Or use a historical query, such as `select .. from table(car_live_data)..`
