@@ -4,7 +4,7 @@ This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-dri
 
 ## Add database
 
-1. Once you've started up Metabase, open http://localhost:3000 , go to "Admin settings" (top-right), then "Databases" tab and add a database and select "Timieplus Proton".
+1. Once you've started up Metabase, open http://localhost:3000 , go to "Admin settings" (top-right), then "Databases" tab and add a database and select "Timeplus Proton".
 2. You'll need to provide the Host/Port. Default localhost and 3218 just work.
 
 ## Run Query
