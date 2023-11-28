@@ -1,6 +1,6 @@
 # Proton driver for Metabase
 
-This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-driver with necessary revisions to better fit streaming processing and Proton.
+This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-driver with necessary revisions to better fit Proton.
 
 ## Add database
 
