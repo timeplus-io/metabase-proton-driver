@@ -4,7 +4,7 @@
   <groupId>metabase</groupId>
   <artifactId>proton-driver</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <name>proton-driver</name>
   <description>Timeplus Proton driver for Metabase</description>
   <url>http://github.com/timeplus-io/metabase-proton-driver</url>
@@ -75,7 +75,7 @@
     <dependency>
       <groupId>com.timeplus</groupId>
       <artifactId>proton-jdbc</artifactId>
-      <version>0.4.0</version>
+      <version>0.6.0</version>
     </dependency>
     <dependency>
       <groupId>clojure.java-time</groupId>

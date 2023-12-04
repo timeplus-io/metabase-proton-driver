@@ -1,11 +1,11 @@
-(defproject metabase/proton-driver "0.0.1"
+(defproject metabase/proton-driver "0.0.2"
   :description "Timeplus Proton driver for Metabase"
   :license "Apache License 2.0"
   :url "http://github.com/timeplus-io/metabase-proton-driver"
   :min-lein-version "2.5.0"
 
   :dependencies
-  [[com.timeplus/proton-jdbc "0.4.0"]
+  [[com.timeplus/proton-jdbc "0.6.0"]
    [clojure.java-time "0.3.2"]
   ]
   

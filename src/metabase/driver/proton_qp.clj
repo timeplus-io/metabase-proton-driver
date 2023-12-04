@@ -24,7 +24,7 @@
             ZonedDateTime]
            java.util.Arrays))
 
-;; (set! *warn-on-reflection* true) ;; isn't enabled because of Arrays/toString call
+;; (set! *warn-on-reflection* true) ;; isn't enabled because of Arrays/to_string call
 
 (defmethod sql.qp/quote-style       :proton [_] :mysql)
 (defmethod sql.qp/honey-sql-version :proton [_] 2)
@@ -204,7 +204,7 @@
 ;; Substring does not work for Enums, so we need to cast to String
 (defmethod sql.qp/->honeysql [:proton :substring]
   [driver [_ arg start length]]
-  (let [str [:'toString (sql.qp/->honeysql driver arg)]]
+  (let [str [:'to_string (sql.qp/->honeysql driver arg)]]
     (if length
       [:'substring str
        (sql.qp/->honeysql driver start)
