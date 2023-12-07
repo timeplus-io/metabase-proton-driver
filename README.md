@@ -17,7 +17,7 @@ The build process is largely based on https://github.com/databendcloud/metabase-
 
 - [Leiningen](https://leiningen.org/)
 
-## Steps
+### Steps
 
 1. Clone and build metabase dependency jar.
 
