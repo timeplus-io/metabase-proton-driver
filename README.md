@@ -2,6 +2,9 @@
 
 This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-driver with necessary revisions to better fit Proton.
 
+## Install
+If you are about to use metabase for the first time, install the proper JVM and start it with `java -jar metabase.jar` to start it for the first time. This will create a plugins folder. Stop the Java process, put the proton.metabase-driver.jar in the plugins folder and start it again.
+
 ## Add database
 
 1. Once you've started up Metabase, open http://localhost:3000 , go to "Admin settings" (top-right), then "Databases" tab and add a database and select "Timeplus Proton".
@@ -10,7 +13,7 @@ This repo is a forked from https://github.com/ClickHouse/metabase-clickhouse-dri
 ## Run Query
 Please note, by default Proton's query behavior is streaming SQL, looking for new data in the future and never ends. This can be considered as hang for Metabase. So please use `select .. from .. LIMIT 100` to stop the query at 100 events. Or use a historical query, such as `select .. from table(car_live_data)..`
 
-### Build from source
+## Build from source
 The build process is largely based on https://github.com/databendcloud/metabase-databend-driver. (IMHO, Leiningen provides much better compiling error message than the built-in `clojure -X:build:drivers:build/driver`)
 
 ### Prerequisites
@@ -54,7 +57,7 @@ The build process is largely based on https://github.com/databendcloud/metabase-
    LEIN_SNAPSHOTS_IN_RELEASE=true DEBUG=1 lein uberjar
    ```
 
-5. Let's assume we download `metabase.jar` from the [Metabase jar](https://www.metabase.com/docs/latest/operations-guide/running-the-metabase-jar-file.html) to `~/metabase/` and we built the project above. Copy the built jar(proton.metabase-driver.jar) to the Metabase plugins directly and run Metabase from there!
+5. Let's assume we download `metabase.jar` from the [Metabase jar](https://www.metabase.com/docs/latest/operations-guide/running-the-metabase-jar-file.html) to `~/metabase/` and we built the project above. Copy the built jar(proton.metabase-driver.jar) to the Metabase plugins folder and run Metabase from there!
 
    ```shell
    cd ~/metabase/
