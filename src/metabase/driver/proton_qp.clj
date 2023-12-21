@@ -33,7 +33,7 @@
   [_ _ expr]
   ;; a tick in the function name prevents HSQL2 to make the function call UPPERCASE
   ;; https://cljdoc.org/d/com.github.seancorfield/honeysql/2.4.1011/doc/getting-started/other-databases#clickhouse
-  (sql.qp/adjust-day-of-week :proton [:'dayOfWeek expr]))
+  (sql.qp/adjust-day-of-week :proton [:'day_of_week expr]))
 
 (defmethod sql.qp/date [:proton :default]
   [_ _ expr]
@@ -41,35 +41,35 @@
 
 (defmethod sql.qp/date [:proton :minute]
   [_ _ expr]
-  [:'toStartOfMinute expr])
+  [:'to_start_of_minute expr])
 
 (defmethod sql.qp/date [:proton :minute-of-hour]
   [_ _ expr]
-  [:'toMinute expr])
+  [:'to_minute expr])
 
 (defmethod sql.qp/date [:proton :hour]
   [_ _ expr]
-  [:'toStartOfHour expr])
+  [:'to_start_of_hour expr])
 
 (defmethod sql.qp/date [:proton :hour-of-day]
   [_ _ expr]
-  [:'toHour expr])
+  [:'to_hour expr])
 
 (defmethod sql.qp/date [:proton :day-of-month]
   [_ _ expr]
-  [:'toDayOfMonth expr])
+  [:'to_day_of_month expr])
 
 (defn- to-start-of-week
   [expr]
-  [:'toMonday expr])
+  [:'to_monday expr])
 
 (defn- to-start-of-year
   [expr]
-  [:'toStartOfYear expr])
+  [:'to_start_of_year expr])
 
 (defn- to-relative-day-num
   [expr]
-  [:'toRelativeDayNum expr])
+  [:'to_relative_day_num expr])
 
 (defmethod sql.qp/date [:proton :day-of-year]
   [_ _ expr]
@@ -80,23 +80,23 @@
 
 (defmethod sql.qp/date [:proton :week-of-year-iso]
   [_ _ expr]
-  [:'toISOWeek expr])
+  [:'to_iso_week expr])
 
 (defmethod sql.qp/date [:proton :month]
   [_ _ expr]
-  [:'toStartOfMonth expr])
+  [:'to_start_of_month expr])
 
 (defmethod sql.qp/date [:proton :month-of-year]
   [_ _ expr]
-  [:'toMonth expr])
+  [:'to_month expr])
 
 (defmethod sql.qp/date [:proton :quarter-of-year]
   [_ _ expr]
-  [:'toQuarter expr])
+  [:'to_quarter expr])
 
 (defmethod sql.qp/date [:proton :year]
   [_ _ expr]
-  [:'toStartOfYear expr])
+  [:'to_start_of_year expr])
 
 (defmethod sql.qp/date [:proton :day]
   [_ _ expr]
@@ -108,7 +108,7 @@
 
 (defmethod sql.qp/date [:proton :quarter]
   [_ _ expr]
-  [:'toStartOfQuarter expr])
+  [:'to_start_of_quarter expr])
 
 (defmethod sql.qp/unix-timestamp->honeysql [:proton :seconds]
   [_ _ expr]
@@ -116,11 +116,11 @@
 
 (defmethod sql.qp/unix-timestamp->honeysql [:proton :milliseconds]
   [_ _ expr]
-  [:'toDateTime64 (h2x// expr 1000) 3])
+  [:'to_datetime64 (h2x// expr 1000) 3])
 
 (defn- date-time-parse-fn
   [nano]
-  (if (zero? nano) :'parseDateTimeBestEffort :'parseDateTime64BestEffort))
+  (if (zero? nano) :'parse_datetime_best_effort :'parse_datetime64_best_effort))
 
 (defmethod sql.qp/->honeysql [:proton LocalDateTime]
   [_ ^java.time.LocalDateTime t]
@@ -143,7 +143,7 @@
 
 (defmethod sql.qp/->honeysql [:proton LocalDate]
   [_ ^java.time.LocalDate t]
-  [:'parseDateTimeBestEffort t])
+  [:'parse_datetime_best_effort t])
 
 (defn- local-date-time
   [^java.time.LocalTime t]
@@ -161,7 +161,7 @@
 
 (defn- args->float64
   [args]
-  (map (fn [arg] [:'toFloat64 (sql.qp/->honeysql :proton arg)]) args))
+  (map (fn [arg] [:'to_float64 (sql.qp/->honeysql :proton arg)]) args))
 
 (defn- interval? [expr]
   (mbql.u/is-clause? :interval expr))
@@ -218,14 +218,14 @@
 
 (defmethod sql.qp/->float :proton
   [_ value]
-  [:'toFloat64 value])
+  [:'to_float64 value])
 
 (defmethod sql.qp/->honeysql [:proton :value]
   [driver value]
   (let [[_ value {base-type :base_type}] value]
     (when (some? value)
       (condp #(isa? %2 %1) base-type
-        :type/IPAddress [:'toIPv4 value]
+        :type/IPAddress [:'to_ipv4 value]
         (sql.qp/->honeysql driver value)))))
 
 ;; the filter criterion reads "is empty"
@@ -310,11 +310,11 @@
 
 (defmethod sql.qp/->honeysql [:proton :starts-with]
   [_ [_ field value options]]
-  (proton-string-fn :'startsWith field value options))
+  (proton-string-fn :'starts_with field value options))
 
 (defmethod sql.qp/->honeysql [:proton :ends-with]
   [_ [_ field value options]]
-  (proton-string-fn :'endsWith field value options))
+  (proton-string-fn :'ends_with field value options))
 
 ;; FIXME: there are still many failing tests that prevent us from turning this feature on
 ;; (defmethod sql.qp/->honeysql [:proton :convert-timezone]
@@ -328,7 +328,7 @@
 ;; We do not have Time data types, so we cheat a little bit
 (defmethod sql.qp/cast-temporal-string [:proton :Coercion/ISO8601->Time]
   [_driver _special_type expr]
-  [:'parseDateTimeBestEffort [:'concat "1970-01-01T" expr]])
+  [:'parse_datetime_best_effort [:'concat "1970-01-01T" expr]])
 
 (defmethod sql.qp/cast-temporal-byte [:proton :Coercion/ISO8601->Time]
   [_driver _special_type expr]
