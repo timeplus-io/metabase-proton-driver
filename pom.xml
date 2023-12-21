@@ -4,7 +4,7 @@
   <groupId>metabase</groupId>
   <artifactId>proton-driver</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <name>proton-driver</name>
   <description>Timeplus Proton driver for Metabase</description>
   <url>http://github.com/timeplus-io/metabase-proton-driver</url>

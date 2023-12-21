@@ -11,7 +11,7 @@ If you are about to use metabase for the first time, install the proper JVM and 
 2. You'll need to provide the Host/Port. Default localhost and 8123 just work.
 
 ## Run Query
-Please note, by default Proton's query behavior is streaming SQL, looking for new data in the future and never ends. This can be considered as hang for Metabase. So please use `select .. from .. LIMIT 100` to stop the query at 100 events. Or use a historical query, such as `select .. from table(car_live_data)..`
+Please note, with port 8123, by default Proton's query behavior is batch SQL, looking for the past data.
 
 ## Build from source
 The build process is largely based on https://github.com/databendcloud/metabase-databend-driver. (IMHO, Leiningen provides much better compiling error message than the built-in `clojure -X:build:drivers:build/driver`)
@@ -51,13 +51,13 @@ The build process is largely based on https://github.com/databendcloud/metabase-
    mvn deploy:deploy-file -Durl=file:repo -DgroupId=metabase-core -DartifactId=metabase-core -Dversion=1.40 -Dpackaging=jar -Dfile=metabase.jar
    ```
 
-4. Build the jar
+4. Build the jar (key steps to compile *.clj source code)
 
    ```shell
    LEIN_SNAPSHOTS_IN_RELEASE=true DEBUG=1 lein uberjar
    ```
 
-5. Let's assume we download `metabase.jar` from the [Metabase jar](https://www.metabase.com/docs/latest/operations-guide/running-the-metabase-jar-file.html) to `~/metabase/` and we built the project above. Copy the built jar(proton.metabase-driver.jar) to the Metabase plugins folder and run Metabase from there!
+5. Let's assume we download `metabase.jar` from the [Metabase jar](https://www.metabase.com/docs/latest/operations-guide/running-the-metabase-jar-file.html) to `~/metabase/` and we built the project above. Copy the built jar(target/uberjar/proton.metabase-driver.jar) to the Metabase plugins folder and run Metabase from there!
 
    ```shell
    cd ~/metabase/
