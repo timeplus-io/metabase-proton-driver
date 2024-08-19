@@ -4,7 +4,7 @@
   <groupId>metabase</groupId>
   <artifactId>proton-driver</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.3</version>
+  <version>1.50.3</version>
   <name>proton-driver</name>
   <description>Timeplus Proton driver for Metabase</description>
   <url>http://github.com/timeplus-io/metabase-proton-driver</url>
@@ -17,7 +17,7 @@
     <url>https://github.com/timeplus-io/metabase-proton-driver</url>
     <connection>scm:git:git://github.com/timeplus-io/metabase-proton-driver.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/timeplus-io/metabase-proton-driver.git</developerConnection>
-    <tag>9b989f07a7fad7e41074806dd4872bd3bc7f9cc8</tag>
+    <tag>d30af03fc7aad1467c88645daf4f53c49bb4e3b3</tag>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>

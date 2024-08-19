@@ -1,6 +1,6 @@
 info:
   name: Metabase Proton Driver
-  version: 0.0.3
+  version: 1.50.3
   description: Allows Metabase to connect to Timeplus Proton databases
 contact-info:
   name: Jove Zhong
@@ -15,7 +15,7 @@ driver:
       default: "localhost"
     - merge:
         - port
-        - default: 3218
+        - default: 8123
 init:
   - step: load-namespace
     namespace: metabase.driver.proton
