@@ -31,7 +31,7 @@ The build process is largely based on https://github.com/databendcloud/metabase-
    cd modules/drivers
    clojure -X:deps prep
    cd ../..
-   ./bin/build.sh
+   clojure -T:build uberjar
    ```
 
 2. Clone metabase-proton-driver repo
@@ -70,3 +70,10 @@ You should see a message on startup similar to:
 2023-11-18 09:55:37,102 DEBUG plugins.lazy-loaded-driver :: Registering lazy loading driver :proton...
 2023-11-18 09:55:37,102 INFO driver.impl :: Registered driver :proton (parents: [:sql-jdbc]) 🚚
 ```
+
+## Choosing the Right Version
+
+| Metabase Release | Driver Version |
+|------------------|----------------|
+| v0.47.8          | v0.0.3         |
+| v0.50.20         | v0.50.3        |
