@@ -17,7 +17,7 @@
 
   :profiles
   {:provided
-   {:dependencies [[metabase-core "1.40"]]}
+   {:dependencies [[metabase-core/metabase-core "1.40"]]}
 
    :uberjar
    {:auto-clean    true

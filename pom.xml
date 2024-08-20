@@ -17,7 +17,7 @@
     <url>https://github.com/timeplus-io/metabase-proton-driver</url>
     <connection>scm:git:git://github.com/timeplus-io/metabase-proton-driver.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/timeplus-io/metabase-proton-driver.git</developerConnection>
-    <tag>d30af03fc7aad1467c88645daf4f53c49bb4e3b3</tag>
+    <tag>586984cbc5800d41f0dd67cfb6f447069d9591f5</tag>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>

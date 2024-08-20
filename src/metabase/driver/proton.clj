@@ -7,7 +7,6 @@
             [metabase.config :as config]
             [metabase.driver :as driver]
             [metabase.driver.proton-introspection]
-            ;;[metabase.driver.proton-nippy]
             [metabase.driver.proton-qp]
             [metabase.driver.proton-version :as proton-version]
             [metabase.driver.ddl.interface :as ddl.i]
@@ -21,8 +20,7 @@
             [metabase.query-processor.store :as qp.store]
             [metabase.upload :as upload]
             [metabase.util :as u]
-            [metabase.util.log :as log])
-  ;;(:import  [com.timeplus.proton.jdbc.internal ProtonStatementImpl]))
+            [metabase.util.log :as log]))
 
 (set! *warn-on-reflection* true)
 

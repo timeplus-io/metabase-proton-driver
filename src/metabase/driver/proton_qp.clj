@@ -26,7 +26,7 @@
             ZonedDateTime]
            java.util.Arrays))
 
-;; (set! *warn-on-reflection* true) ;; isn't enabled because of Arrays/to_string call
+;; (set! *warn-on-reflection* true) ;; isn't enabled because of Arrays/toString call
 
 (defmethod sql.qp/quote-style :proton [_] :mysql)
 
