@@ -76,4 +76,4 @@ You should see a message on startup similar to:
 | Metabase Release | Driver Version |
 |------------------|----------------|
 | v0.47.8          | v0.0.3         |
-| v0.50.20         | v0.50.3        |
+| v0.50.20         | v0.50.4        |
