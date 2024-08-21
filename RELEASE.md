@@ -6,17 +6,16 @@ Updating the driver from the upstream repo ([ClickHouse](https://github.com/Clic
 
 This version of the Timeplus Proton driver is based on [01ecc5fbcc53d007b9a7357bd358428a4f3bc738](https://github.com/ClickHouse/metabase-clickhouse-driver/commit/01ecc5fbcc53d007b9a7357bd358428a4f3bc738) of the upstream driver. 
 
-A. Start by performing simple text replacements for:
-  * `s/ClickHouse/Proton/g` -- proper nouns embedded in documentation and comments
-  * `s/:clickhouse/:proton/g` -- keywords
-  * `s/clickhouse/proton/g` -- symbols
- 
- inside the following 4 files:
+There are a total of 4 files that need to be updated:
 1. `src/metabase/driver/proton.clj`
 2. `src/metabase/driver/proton_introspection.clj`
 3. `src/metabase/driver/proton_version.clj`
 4. `src/metabase/driver/proton_qp.clj`
 
+A. Start by performing simple text replacements for:
+  * `s/ClickHouse/Proton/g` -- proper nouns embedded in documentation and comments
+  * `s/:clickhouse/:proton/g` -- keywords
+  * `s/clickhouse/proton/g` -- symbols
 
 B. The 4th file -- `src/metabase/driver/proton_qp.clj` -- requires additional text replacements.
 
@@ -26,7 +25,12 @@ cd metabase-proton-driver/scripts/
 ./replace.sh ../src/metabase/driver/proton_qp.clj
 ```
 
-C. Running the command below should catch any stray errors like unbalanced parentheses or syntax errors: 
+C. Note that `src/metabase/driver/proton.clj` and `src/metabase/driver/proton_qp.clj` now hard-code a minimum supported version for Proton. I tested my changes on v1.5.6 so it's currently set to v1.5 in both files.
+* [`src/metabase/driver/proton.clj`](https://github.com/ayewo/metabase-proton-driver/blob/46550c6eb8d7e363d9f3a0fb882c5e7185abe38d/src/metabase/driver/proton.clj#L220)
+* [`src/metabase/driver/proton_qp.clj`](https://github.com/ayewo/metabase-proton-driver/blob/46550c6eb8d7e363d9f3a0fb882c5e7185abe38d/src/metabase/driver/proton_qp.clj#L391-L398)
+
+
+D. Running the command below should catch any stray errors like unbalanced parentheses or syntax errors: 
 ```bash
 lein check
 ```
