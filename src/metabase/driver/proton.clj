@@ -1,5 +1,5 @@
 (ns metabase.driver.proton
-  "Driver for Timeplus Proton databases"
+  "Driver for Timeplus"
   #_{:clj-kondo/ignore [:unsorted-required-namespaces]}
   (:require [clojure.core.memoize :as memoize]
             [clojure.string :as str]
@@ -26,7 +26,7 @@
 
 (driver/register! :proton :parent #{:sql-jdbc})
 
-(defmethod driver/display-name :proton [_] "Timeplus Proton")
+(defmethod driver/display-name :proton [_] "Timeplus")
 (def ^:private product-name "metabase/1.50.3")
 
 (defmethod driver/prettify-native-form :proton

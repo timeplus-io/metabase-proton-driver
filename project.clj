@@ -1,5 +1,5 @@
 (defproject metabase/proton-driver "0.50.4"
-  :description "Timeplus Proton driver for Metabase"
+  :description "Timeplus driver for Metabase"
   :license "Apache License 2.0"
   :url "http://github.com/timeplus-io/metabase-proton-driver"
   :min-lein-version "2.5.0"
@@ -25,4 +25,4 @@
     :javac-options ["-target" "1.8", "-source" "1.8"]
     :target-path   "target/%s"
     :jvm-opts      ["-Dclojure.compiler.direct-linking=true"]
-    :uberjar-name  "proton.metabase-driver.jar"}})
+    :uberjar-name  "timeplus.metabase-driver.jar"}})

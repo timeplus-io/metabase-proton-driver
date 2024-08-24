@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
   <version>0.50.4</version>
   <name>proton-driver</name>
-  <description>Timeplus Proton driver for Metabase</description>
+  <description>Timeplus driver for Metabase</description>
   <url>http://github.com/timeplus-io/metabase-proton-driver</url>
   <licenses>
     <license>
