@@ -12,33 +12,32 @@
 
 (def ^:private database-type->base-type
   (sql-jdbc.sync/pattern-based-database-type->base-type
-   [[#"array" :type/Array]
-    [#"bool" :type/Boolean]
-    [#"datetime64" :type/DateTime]
-    [#"datetime" :type/DateTime]
-    [#"date" :type/Date]
-    [#"date32" :type/Date]
-    [#"decimal" :type/Decimal]
-    [#"enum8" :type/Text]
-    [#"enum16" :type/Text]
+   [[#"array"       :type/Array]
+    [#"bool"        :type/Boolean]
+    [#"datetime64"  :type/DateTime]
+    [#"datetime"    :type/DateTime]
+    [#"date"        :type/Date]
+    [#"date32"      :type/Date]
+    [#"decimal"     :type/Decimal]
+    [#"enum8"       :type/Text]
+    [#"enum16"      :type/Text]
     [#"fixedstring" :type/TextLike]
-    [#"float32" :type/Float]
-    [#"float64" :type/Float]
-    [#"int8" :type/Integer]
-    [#"int16" :type/Integer]
-    [#"int32" :type/Integer]
-    [#"int64" :type/BigInteger]
-    ;; FIXME: set it back to IPAddress when 0.48 is out, as it should resolve IPAddress and other semantic types checks issues
-    [#"ipv4" :type/TextLike]
-    [#"ipv6" :type/TextLike]
-    [#"map" :type/Dictionary]
-    [#"string" :type/Text]
-    [#"tuple" :type/*]
-    [#"uint8" :type/Integer]
-    [#"uint16" :type/Integer]
-    [#"uint32" :type/Integer]
-    [#"uint64" :type/BigInteger]
-    [#"uuid" :type/UUID]]))
+    [#"float32"     :type/Float]
+    [#"float64"     :type/Float]
+    [#"int8"        :type/Integer]
+    [#"int16"       :type/Integer]
+    [#"int32"       :type/Integer]
+    [#"int64"       :type/BigInteger]
+    [#"ipv4"        :type/IPAddress]
+    [#"ipv6"        :type/IPAddress]
+    [#"map"         :type/Dictionary]
+    [#"string"      :type/Text]
+    [#"tuple"       :type/*]
+    [#"uint8"       :type/Integer]
+    [#"uint16"      :type/Integer]
+    [#"uint32"      :type/Integer]
+    [#"uint64"      :type/BigInteger]
+    [#"uuid"        :type/UUID]]))
 
 (defn- normalize-db-type
   [db-type]
@@ -51,10 +50,10 @@
     (normalize-db-type (subs db-type 9 (- (count db-type) 1)))
     ;; DateTime64
     (str/starts-with? db-type "datetime64")
-    :type/DateTime ;; FIXME: should be type/DateTimeWithTZ (#200)
+    (if (> (count db-type) 13) :type/DateTimeWithTZ :type/DateTime)
     ;; DateTime
     (str/starts-with? db-type "datetime")
-    :type/DateTime ;; FIXME: should be type/DateTimeWithTZ (#200)
+    (if (> (count db-type) 8) :type/DateTimeWithTZ :type/DateTime)
     ;; Enum*
     (str/starts-with? db-type "enum")
     :type/Text
@@ -74,7 +73,10 @@
 ;; Nullable(DateTime) -> :type/DateTime, SimpleAggregateFunction(sum, Int64) -> :type/BigInteger, etc
 (defmethod sql-jdbc.sync/database-type->base-type :proton
   [_ database-type]
-  (normalize-db-type (subs (str database-type) 1)))
+  (let [db-type (if (keyword? database-type)
+                  (subs (str database-type) 1)
+                  database-type)]
+    (normalize-db-type (u/lower-case-en db-type))))
 
 (defmethod sql-jdbc.sync/excluded-schemas :proton [_]
   #{"system" "information_schema" "INFORMATION_SCHEMA"})
@@ -151,14 +153,14 @@
 
 (defn- ^:private is-db-required?
   [field]
-  (not (str/starts-with? (get-in field [:database-type]) "nullable")))
+  (not (str/starts-with? (get field :database-type) "nullable")))
 
 (defmethod driver/describe-table :proton
   [_ database table]
   (let [table-metadata (sql-jdbc.sync/describe-table :proton database table)
         filtered-fields (for [field (:fields table-metadata)
-                              :let [updated-field (update-in field [:database-required]
-                                                             (fn [_] (is-db-required? field)))]
+                              :let [updated-field (update field :database-required
+                                                          (fn [_] (is-db-required? field)))]
                               ;; Skip all AggregateFunction (but keeping SimpleAggregateFunction) columns
                               ;; JDBC does not support that and it crashes the data browser
                               :when (not (re-matches #"^aggregatefunction\(.+$"

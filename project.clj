@@ -1,4 +1,4 @@
-(defproject metabase/proton-driver "0.0.3"
+(defproject metabase/proton-driver "0.50.4"
   :description "Timeplus Proton driver for Metabase"
   :license "Apache License 2.0"
   :url "http://github.com/timeplus-io/metabase-proton-driver"
@@ -17,7 +17,7 @@
 
   :profiles
   {:provided
-   {:dependencies [[metabase-core "1.40"]]}
+   {:dependencies [[com.timeplus.external/metabase-core "0.50.20"]]}
 
    :uberjar
    {:auto-clean    true
