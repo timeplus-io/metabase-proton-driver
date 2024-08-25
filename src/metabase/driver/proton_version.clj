@@ -1,4 +1,4 @@
-"Provides the info about the Proton version. Extracted from the main proton.clj file,
+"Provides the info about the Timeplus version. Extracted from the main proton.clj file,
  as both Driver and QP overrides require access to it, avoiding circular dependencies."
 (ns metabase.driver.proton-version
   (:require    [clojure.core.memoize :as memoize]
@@ -6,6 +6,7 @@
                [metabase.driver.sql-jdbc.connection :as sql-jdbc.conn]
                [metabase.driver.sql-jdbc.execute :as sql-jdbc.execute]
                [metabase.driver.util :as driver.u]
+               [metabase.util.log :as log]
                [metabase.lib.metadata :as lib.metadata]
                [metabase.query-processor.store :as qp.store]))
 
@@ -40,7 +41,7 @@
   (get-proton-version (:details db)))
 
 (defn is-at-least?
-  "Is Proton version at least `major.minor` (e.g., 24.4)?"
+  "Is Timeplus version at least `major.minor` (e.g., 1.5)?"
   ([major minor]
    ;; used from the QP overrides; we don't have access to the DB object
    (is-at-least? major minor (lib.metadata/database (qp.store/metadata-provider))))
@@ -51,7 +52,7 @@
      (driver.u/semantic-version-gte [(:major semantic) (:minor semantic)] [major minor]))))
 
 (defn with-min
-  "Execute `f` if the Proton version is greater or equal to `major.minor` (e.g., 24.4);
+  "Execute `f` if the Timeplus version is greater or equal to `major.minor` (e.g., 1.5);
    otherwise, execute `fallback-f`, if it's provided."
   ([major minor f]
    (with-min major minor f nil))

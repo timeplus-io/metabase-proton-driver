@@ -2,7 +2,7 @@
  ["src" "resources"]
 
  :deps
- {com.timeplus/proton-jdbc {:mvn/version "0.6.0"}
+ {com.timeplus/proton-jdbc {:mvn/version "0.7.1"}
   com.widdindustries/cljc.java-time {:mvn/version "0.1.21"}
   com.clickhouse/clickhouse-jdbc$http
   {:mvn/version "0.6.1"

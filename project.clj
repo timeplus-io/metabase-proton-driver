@@ -1,11 +1,11 @@
-(defproject metabase/proton-driver "0.50.4"
+(defproject metabase/proton-driver "0.50.5"
   :description "Timeplus driver for Metabase"
   :license "Apache License 2.0"
   :url "http://github.com/timeplus-io/metabase-proton-driver"
   :min-lein-version "2.5.0"
 
   :dependencies
-  [[com.timeplus/proton-jdbc "0.6.0"]
+  [[com.timeplus/proton-jdbc "0.7.1"]
    [clojure.java-time "0.3.2"]
   ]
   
@@ -17,7 +17,7 @@
 
   :profiles
   {:provided
-   {:dependencies [[com.timeplus.external/metabase-core "0.50.20"]]}
+   {:dependencies [[com.timeplus.external/metabase-core "0.50.21"]]}
 
    :uberjar
    {:auto-clean    true
@@ -25,4 +25,4 @@
     :javac-options ["-target" "1.8", "-source" "1.8"]
     :target-path   "target/%s"
     :jvm-opts      ["-Dclojure.compiler.direct-linking=true"]
-    :uberjar-name  "timeplus.metabase-driver.jar"}})
+    :uberjar-name  "proton.metabase-driver.jar"}})

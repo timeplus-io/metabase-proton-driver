@@ -10,11 +10,11 @@ If you are about to use Metabase for the first time:
 * install the required JDK version and start it with `java -jar metabase.jar` to start the app. This will create a `plugins/` folder in the current directory. 
 * Stop the Java process with <kbd>Ctrl</kbd> + <kbd>C</kbd>, then copy the `proton.metabase-driver.jar` into the `plugins/` folder and restart the app.
 
-Here's an example [(using Metabase v0.50.20 and Timeplus Proton driver 0.50.4)](#choosing-the-right-version):
+Here's an example [(using Metabase v0.50.21 and Timeplus Proton driver 0.50.5)](#choosing-the-right-version):
 
 ```bash
-export METABASE_VERSION=v0.50.20
-export METABASE_PROTON_DRIVER_VERSION=v0.50.4
+export METABASE_VERSION=v0.50.21
+export METABASE_PROTON_DRIVER_VERSION=v0.50.5
 
 mkdir -p mb/plugins && cd mb
 curl -o metabase.jar https://downloads.metabase.com/$METABASE_VERSION/metabase.jar
@@ -66,7 +66,7 @@ The build process is largely based on https://github.com/databendcloud/metabase-
    cd metabase-proton-driver
    mkdir repo
    lein pom
-   mvn deploy:deploy-file -Durl=file:repo -DgroupId=com.timeplus.external -DartifactId=metabase-core -Dversion=0.50.20 -Dpackaging=jar -Dfile=metabase.jar
+   mvn deploy:deploy-file -Durl=file:repo -DgroupId=com.timeplus.external -DartifactId=metabase-core -Dversion=0.50.21 -Dpackaging=jar -Dfile=metabase.jar
    ```
 
 4. Build the jar (key steps to compile *.clj source code)
@@ -100,6 +100,6 @@ We've adopted the same naming convention for the Timeplus Proton driver since ou
 | Metabase Release | Driver Version |
 |------------------|----------------|
 | v0.47.8          | v0.0.3         |
-| v0.50.20         | v0.50.4        |
+| v0.50.21         | v0.50.5        |
 
 

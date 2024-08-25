@@ -5,7 +5,8 @@
             [metabase.driver.ddl.interface :as ddl.i]
             [metabase.driver.sql-jdbc.connection :as sql-jdbc.conn]
             [metabase.driver.sql-jdbc.sync :as sql-jdbc.sync]
-            [metabase.util :as u])
+            [metabase.util :as u]
+            [metabase.util.log :as log])
   (:import (java.sql DatabaseMetaData)))
 
 (set! *warn-on-reflection* true)
@@ -131,6 +132,7 @@
       (get-in db [:details :db])))
 
 (defn- get-tables-in-dbs [db-or-dbs]
+  (log/trace "get-tables-in-dbs" db-or-dbs)
   (->> (for [db (as-> (or (get-db-name db-or-dbs) "default") dbs
                   (str/split dbs #" ")
                   (remove empty? dbs)
