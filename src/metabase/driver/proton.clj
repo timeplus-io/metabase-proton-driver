@@ -49,6 +49,7 @@
   {:user "default" :password "" :dbname "default" :host "localhost" :port "8123"})
 
 (defn- connection-details->spec* [details]
+  (log/trace "connection-details->spec* called with details:" details)
   (let [;; ensure defaults merge on top of nils
         details (reduce-kv (fn [m k v] (assoc m k (or v (k default-connection-details))))
                            default-connection-details
@@ -67,11 +68,8 @@
       :use_no_proxy (boolean use-no-proxy)
       :use_server_time_zone_for_dates true
       :product_name product-name
-      ;; addresses breaking changes from the 0.5.0 JDBC driver release
-      ;; see https://github.com/ClickHouse/clickhouse-java/releases/tag/v0.5.0
-      ;; and https://github.com/ClickHouse/clickhouse-java/issues/1634#issuecomment-2110392634
       :databaseTerm "schema"
-      :remember_last_set_roles true
+      :remember_last_set_roles false
       :http_connection_provider "HTTP_URL_CONNECTION"}
      (sql-jdbc.common/handle-additional-options details :separator-style :url))))
 
@@ -99,12 +97,6 @@
                        ;; otherwise it's a spec and we can't get the db
                        :else nil)]
          (sql-jdbc.execute/set-role-if-supported! driver conn db))
-       (let [read-only? (not write?)]
-         (try
-           (log/trace (pr-str (list '.setReadOnly 'conn read-only?)))
-           (.setReadOnly conn read-only?)
-           (catch Throwable e
-             (log/debugf e "Error setting connection readOnly to %s" (pr-str read-only?)))))
        (when-not write?
          (try
            (log/trace (pr-str '(.setAutoCommit conn true)))
@@ -119,7 +111,7 @@
      (f conn))))
 
 (def ^:private ^{:arglists '([db-details])} cloud?
-  "Returns true if the `db-details` are for a Proton Cloud instance, and false otherwise. If it fails to connect
+  "Returns true if the `db-details` are for a ClickHouse Cloud instance(Not Appliable), and false otherwise. If it fails to connect
    to the database, it throws a java.sql.SQLException."
   (memoize/ttl
    (fn [db-details]
@@ -152,6 +144,7 @@
 
 (defmethod driver/can-connect? :proton
   [driver details]
+  (log/trace "can-connect")
   (if config/is-test?
     (try
       ;; Default SELECT 1 is not enough for Metabase test suite,
@@ -167,7 +160,7 @@
              (when (.next rset)
                (.getBoolean rset 1))))))
       (catch Throwable e
-        (log/error e "An exception during Proton connectivity check")
+        (log/error e "An exception during Timeplus connectivity check")
         false))
     ;; During normal usage, fall back to the default implementation
     (sql-jdbc.conn/can-connect? driver details)))
