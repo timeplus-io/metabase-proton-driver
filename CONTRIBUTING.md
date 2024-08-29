@@ -13,7 +13,7 @@ and help us maintain up-to-date documentation.
 ### Requirements
 
 * Clojure 1.11+
-* OpenJDK 17
+* OpenJDK 11
 * Node.js 16.x
 * Yarn
 

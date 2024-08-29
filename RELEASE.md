@@ -36,6 +36,7 @@ lein check
 ```
 
 ## Building a New Driver Version
+0. Please use JDK 11, as JDK 17 or above are not offically supported by Metabase ([source](https://github.com/metabase/metabase/issues/47207#issuecomment-2309931552)), e.g.`sdk use java 11.0.24-tem`
 1. Visit Metabase's GitHub [releases page](https://github.com/metabase/metabase/releases) and make a note of the version of the _latest_ binary release (JAR file).
 (The _latest_ JAR can also be downloaded from the Metabase [distribution page](https://metabase.com/start/jar.html)).
 
