@@ -151,7 +151,7 @@
       ;; as it works slightly differently than expected there
       (let [spec  (sql-jdbc.conn/connection-details->spec driver details)
             db    (or (:dbname details) (:db details) "default")]
-        (sql-jdbc.execute/do-with-connection-with-options
+        (sql-jdbc.conn/do-with-connection-spec-for-testing-connection
          driver spec nil
          (fn [^java.sql.Connection conn]
            (let [stmt (.prepareStatement conn "SELECT count(*) > 0 FROM system.databases WHERE name = ?")
