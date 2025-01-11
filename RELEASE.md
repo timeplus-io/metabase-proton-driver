@@ -13,6 +13,7 @@ There are a total of 4 files that need to be updated:
 4. `src/metabase/driver/proton_qp.clj`
 
 A. Start by performing simple text replacements for:
+  * `s/com.clickhouse./com.timeplus.proton./g` -- JDBC package names
   * `s/ClickHouse/Proton/g` -- proper nouns embedded in documentation and comments
   * `s/:clickhouse/:proton/g` -- keywords
   * `s/clickhouse/proton/g` -- symbols
@@ -23,14 +24,17 @@ B. The 4th file -- `src/metabase/driver/proton_qp.clj` -- requires additional te
 ```bash
 cd metabase-proton-driver/scripts/
 ./replace.sh ../src/metabase/driver/proton_qp.clj
+./replace.sh ../src/metabase/driver/proton.clj
+./replace.sh ../src/metabase/driver/proton_introspection.clj
+./replace.sh ../src/metabase/driver/proton_version.clj
 ```
 
 C. Note that `src/metabase/driver/proton.clj` and `src/metabase/driver/proton_qp.clj` now hard-code a minimum supported version for Timeplus. It's currently set to v1.5 in both files.
-* `src/metabase/driver/proton.clj` L220
-* `src/metabase/driver/proton_qp.clj` L391-L398
+* `src/metabase/driver/proton.clj` L280, change from 24.x to 1.5
+* `src/metabase/driver/proton_qp.clj` L389,L396
 
 
-D. Running the command below should catch any stray errors like unbalanced parentheses or syntax errors: 
+D. Running the command below (not in scripts folder, in partent folder) should catch any stray errors like unbalanced parentheses or syntax errors:
 ```bash
 lein check
 ```
@@ -43,26 +47,26 @@ lein check
    As at the time of this writing, the latest version is [v0.50.21](https://github.com/metabase/metabase/releases/tag/v0.50.21).
 
 2. Update the version number for Metabase in `project.clj`.
-   
+
    Also remember to bump the driver's version number when building a new version in:
    * `project.clj` and
    * `resources/metabase-plugin.yaml`.
 
    Here's the highlight for `project.clj`:
 ```
- (defproject metabase/proton-driver "0.50.5"
-   {:dependencies [[com.timeplus.external/metabase-core "0.50.21"]]}
+ (defproject metabase/proton-driver "1.51.0"
+   {:dependencies [[com.timeplus.external/metabase-core "0.51.1.2"]]}
 ```
 
    Here's the highlight for `resources/metabase-plugin.yaml`:
 ```
-   version: 0.50.5
+   version: 1.51.0
          - default: 8123
 ```
 
 3. Save the desired version of Metabase you noted earlier in an environment variable. We will build a new driver against this version.
 ```bash
-export METABASE_VERSION=0.50.21
+export METABASE_VERSION=0.51.1.2
 ```
 
 4. Clone the Timeplus Proton driver locally:
@@ -121,15 +125,14 @@ cp scripts/metabase.db.mv.db /tmp/metabase/
 
 
 ## Testing the Newly Built Driver Manually
-These commands will set up a running instance of Metabase with the newly built driver:
+These commands will set up a running instance of Metabase with the newly built driver at port 3000 (make sure the port is available, i.e you are not running Grafana):
 
 ```bash
 cd /tmp/metabase/
-
+sdk use java 11.0.24-tem
 MB_PLUGINS_DIR=./plugins; java -Duser.timezone=GMT -jar metabase.jar
 ```
 
 Visit http://localhost:3000/ then login with:
 * admin@example.com
 * pa55w0rd!
-

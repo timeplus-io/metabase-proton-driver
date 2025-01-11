@@ -1,13 +1,13 @@
 info:
-  name: Metabase ClickHouse Driver
+  name: Metabase Timeplus Driver
   version: 1.51.0
-  description: Allows Metabase to connect to ClickHouse databases.
+  description: Allows Metabase to connect to Timeplus.
 contact-info:
-  name: ClickHouse
-  address: https://github.com/ClickHouse/metabase-clickhouse-driver
+  name: Jove Zhong
+  address: jove@timeplus.com
 driver:
-  name: clickhouse
-  display-name: ClickHouse
+  name: proton
+  display-name: Timeplus
   lazy-load: true
   parent: sql-jdbc
   connection-properties:
@@ -25,7 +25,7 @@ driver:
       display-name: Scan all databases
       type: boolean
       default: false
-      description: Scan all tables from all available ClickHouse databases except the system ones.
+      description: Scan all tables from all available Timeplus databases except the system ones.
 
     - ssl
     - ssh-tunnel
@@ -36,8 +36,8 @@ driver:
       type: boolean
       visible-if:
         advanced-options: true
-    - name: clickhouse-settings
-      display-name: ClickHouse settings (comma-separated)
+    - name: timeplus-settings
+      display-name: Timeplus settings (comma-separated)
       placeholder: "allow_experimental_analyzer=1,max_result_rows=100"
       visible-if:
         advanced-options: true
@@ -48,6 +48,6 @@ driver:
   connection-properties-include-tunnel-config: true
 init:
   - step: load-namespace
-    namespace: metabase.driver.clickhouse
+    namespace: metabase.driver.proton
   - step: register-jdbc-driver
-    class: com.clickhouse.jdbc.ClickHouseDriver
+    class: com.timeplus.proton.jdbc.ProtonDriver
