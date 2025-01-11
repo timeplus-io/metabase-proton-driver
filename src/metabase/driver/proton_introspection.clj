@@ -1,4 +1,4 @@
-(ns metabase.driver.clickhouse-introspection
+(ns metabase.driver.proton-introspection
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.string :as str]
             [metabase.driver :as driver]
@@ -71,14 +71,14 @@
 
 ;; Enum8(UInt8) -> :type/Text, DateTime64(Europe/Amsterdam) -> :type/DateTime,
 ;; Nullable(DateTime) -> :type/DateTime, SimpleAggregateFunction(sum, Int64) -> :type/BigInteger, etc
-(defmethod sql-jdbc.sync/database-type->base-type :clickhouse
+(defmethod sql-jdbc.sync/database-type->base-type :proton
   [_ database-type]
   (let [db-type (if (keyword? database-type)
                   (subs (str database-type) 1)
                   database-type)]
     (normalize-db-type (u/lower-case-en db-type))))
 
-(defmethod sql-jdbc.sync/excluded-schemas :clickhouse [_]
+(defmethod sql-jdbc.sync/excluded-schemas :proton [_]
   #{"system" "information_schema" "INFORMATION_SCHEMA"})
 
 (def ^:private allowed-table-types
@@ -119,7 +119,7 @@
          (jdbc/metadata-result)
          (vec)
          (filter #(and
-                   (not (contains? (sql-jdbc.sync/excluded-schemas :clickhouse) (:table_schem %)))
+                   (not (contains? (sql-jdbc.sync/excluded-schemas :proton) (:table_schem %)))
                    (not-inner-mv-table? %)))
          (tables-set))))
 
@@ -134,7 +134,7 @@
   (->> (for [db (as-> (or (get-db-name db-or-dbs) "default") dbs
                   (str/split dbs #" ")
                   (remove empty? dbs)
-                  (map (comp #(ddl.i/format-name :clickhouse %) str/trim) dbs))]
+                  (map (comp #(ddl.i/format-name :proton %) str/trim) dbs))]
          (jdbc/with-db-metadata [metadata (->spec db-or-dbs)]
            (jdbc/metadata-result
             (get-tables-from-metadata metadata db))))
@@ -142,7 +142,7 @@
        (filter not-inner-mv-table?)
        (tables-set)))
 
-(defmethod driver/describe-database :clickhouse
+(defmethod driver/describe-database :proton
   [_ {{:keys [scan-all-databases]}
       :details :as db}]
   {:tables
@@ -155,9 +155,9 @@
   [field]
   (not (str/starts-with? (get field :database-type) "Nullable")))
 
-(defmethod driver/describe-table :clickhouse
+(defmethod driver/describe-table :proton
   [_ database table]
-  (let [table-metadata (sql-jdbc.sync/describe-table :clickhouse database table)
+  (let [table-metadata (sql-jdbc.sync/describe-table :proton database table)
         filtered-fields (for [field (:fields table-metadata)
                               :let [updated-field (update field :database-required
                                                           (fn [_] (is-db-required? field)))]

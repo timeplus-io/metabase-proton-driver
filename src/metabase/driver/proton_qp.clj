@@ -1,10 +1,10 @@
-(ns metabase.driver.clickhouse-qp
+(ns metabase.driver.proton-qp
   "CLickHouse driver: QueryProcessor-related definition"
   #_{:clj-kondo/ignore [:unsorted-required-namespaces]}
   (:require [clojure.string :as str]
             [honey.sql :as sql]
             [java-time.api :as t]
-            [metabase.driver.clickhouse-version :as clickhouse-version]
+            [metabase.driver.proton-version :as proton-version]
             [metabase.driver.sql-jdbc.execute :as sql-jdbc.execute]
             [metabase.driver.sql.query-processor :as sql.qp :refer [add-interval-honeysql-form]]
             [metabase.driver.sql.util :as sql.u]
@@ -14,7 +14,7 @@
             [metabase.util :as u]
             [metabase.util.date-2 :as u.date]
             [metabase.util.honey-sql-2 :as h2x])
-  (:import [com.clickhouse.data.value ClickHouseArrayValue]
+  (:import [com.timeplus.proton.client.data ProtonArrayValue]
            [java.sql ResultSet ResultSetMetaData Types]
            [java.time
             LocalDate
@@ -27,7 +27,7 @@
 
 ;; (set! *warn-on-reflection* true) ;; isn't enabled because of Arrays/toString call
 
-(defmethod sql.qp/quote-style :clickhouse [_] :mysql)
+(defmethod sql.qp/quote-style :proton [_] :mysql)
 
 ;; without try, there might be test failures when QP is not yet initialized
 ;; e.g., when a test is preparing the dataset
@@ -70,11 +70,11 @@
     (if (and report-timezone (string? db-type) (str/starts-with? db-type "datetime"))
       (let [timezone (extract-datetime-timezone db-type)]
         (if (not (= timezone (u/lower-case-en report-timezone)))
-          [:'toTimeZone expr (h2x/literal report-timezone)]
+          [:'to_time_zone expr (h2x/literal report-timezone)]
           expr))
       expr)))
 
-(defmethod sql.qp/date [:clickhouse :default]
+(defmethod sql.qp/date [:proton :default]
   [_ _ expr]
   expr)
 
@@ -87,44 +87,44 @@
   (-> [ch-fn (in-report-timezone expr)]
       (h2x/with-database-type-info db-type)))
 
-(defmethod sql.qp/date [:clickhouse :day-of-week]
+(defmethod sql.qp/date [:proton :day-of-week]
   [_ _ expr]
   ;; a tick in the function name prevents HSQL2 to make the function call UPPERCASE
-  ;; https://cljdoc.org/d/com.github.seancorfield/honeysql/2.4.1011/doc/getting-started/other-databases#clickhouse
+  ;; https://cljdoc.org/d/com.github.seancorfield/honeysql/2.4.1011/doc/getting-started/other-databases#proton
   (sql.qp/adjust-day-of-week
-   :clickhouse (date-extract :'toDayOfWeek expr "uint8")))
+   :proton (date-extract :'to_day_of_week expr "uint8")))
 
-(defmethod sql.qp/date [:clickhouse :month-of-year]
+(defmethod sql.qp/date [:proton :month-of-year]
   [_ _ expr]
-  (date-extract :'toMonth expr "uint8"))
+  (date-extract :'to_month expr "uint8"))
 
-(defmethod sql.qp/date [:clickhouse :minute-of-hour]
+(defmethod sql.qp/date [:proton :minute-of-hour]
   [_ _ expr]
-  (date-extract :'toMinute expr "uint8"))
+  (date-extract :'to_minute expr "uint8"))
 
-(defmethod sql.qp/date [:clickhouse :hour-of-day]
+(defmethod sql.qp/date [:proton :hour-of-day]
   [_ _ expr]
-  (date-extract :'toHour expr "uint8"))
+  (date-extract :'to_hour expr "uint8"))
 
-(defmethod sql.qp/date [:clickhouse :day-of-month]
+(defmethod sql.qp/date [:proton :day-of-month]
   [_ _ expr]
-  (date-extract :'toDayOfMonth expr "uint8"))
+  (date-extract :'to_day_of_month expr "uint8"))
 
-(defmethod sql.qp/date [:clickhouse :day-of-year]
+(defmethod sql.qp/date [:proton :day-of-year]
   [_ _ expr]
-  (date-extract :'toDayOfYear expr "uint16"))
+  (date-extract :'to_day_of_year expr "uint16"))
 
-(defmethod sql.qp/date [:clickhouse :week-of-year-iso]
+(defmethod sql.qp/date [:proton :week-of-year-iso]
   [_ _ expr]
-  (date-extract :'toISOWeek expr "uint8"))
+  (date-extract :'to_iso_week expr "uint8"))
 
-(defmethod sql.qp/date [:clickhouse :quarter-of-year]
+(defmethod sql.qp/date [:proton :quarter-of-year]
   [_ _ expr]
-  (date-extract :'toQuarter expr "uint8"))
+  (date-extract :'to_quarter expr "uint8"))
 
-(defmethod sql.qp/date [:clickhouse :year-of-era]
+(defmethod sql.qp/date [:proton :year-of-era]
   [_ _ expr]
-  (date-extract :'toYear expr "uint16"))
+  (date-extract :'to_year expr "uint16"))
 
 ;;; ------------------------------------------------------------------------------------
 ;;; Truncate functions
@@ -136,65 +136,65 @@
 
 (defn- to-start-of-week
   [expr]
-  (date-trunc :'toMonday expr))
+  (date-trunc :'to_monday expr))
 
-(defmethod sql.qp/date [:clickhouse :minute]
+(defmethod sql.qp/date [:proton :minute]
   [_ _ expr]
-  (date-trunc :'toStartOfMinute expr))
+  (date-trunc :'to_start_of_minute expr))
 
-(defmethod sql.qp/date [:clickhouse :hour]
+(defmethod sql.qp/date [:proton :hour]
   [_ _ expr]
-  (date-trunc :'toStartOfHour expr))
+  (date-trunc :'to_start_of_hour expr))
 
-(defmethod sql.qp/date [:clickhouse :day]
+(defmethod sql.qp/date [:proton :day]
   [_ _ expr]
-  (date-trunc :'toStartOfDay expr))
+  (date-trunc :'to_start_of_day expr))
 
-(defmethod sql.qp/date [:clickhouse :week]
+(defmethod sql.qp/date [:proton :week]
   [driver _ expr]
   (sql.qp/adjust-start-of-week driver to-start-of-week expr))
 
-(defmethod sql.qp/date [:clickhouse :month]
+(defmethod sql.qp/date [:proton :month]
   [_ _ expr]
-  (date-trunc :'toStartOfMonth expr))
+  (date-trunc :'to_start_of_month expr))
 
-(defmethod sql.qp/date [:clickhouse :quarter]
+(defmethod sql.qp/date [:proton :quarter]
   [_ _ expr]
-  (date-trunc :'toStartOfQuarter expr))
+  (date-trunc :'to_start_of_quarter expr))
 
-(defmethod sql.qp/date [:clickhouse :year]
+(defmethod sql.qp/date [:proton :year]
   [_ _ expr]
-  (date-trunc :'toStartOfYear expr))
+  (date-trunc :'to_start_of_year expr))
 
 ;;; ------------------------------------------------------------------------------------
 ;;; Unix timestamps functions
 ;;; ------------------------------------------------------------------------------------
 
-(defmethod sql.qp/unix-timestamp->honeysql [:clickhouse :seconds]
+(defmethod sql.qp/unix-timestamp->honeysql [:proton :seconds]
   [_ _ expr]
   (h2x/->datetime expr))
 
-(defmethod sql.qp/unix-timestamp->honeysql [:clickhouse :milliseconds]
+(defmethod sql.qp/unix-timestamp->honeysql [:proton :milliseconds]
   [_ _ expr]
   (let [report-timezone (get-report-timezone-id-safely)
         inner-expr      (h2x// expr 1000)]
     (if report-timezone
-      [:'toDateTime64 inner-expr 3 report-timezone]
-      [:'toDateTime64 inner-expr 3])))
+      [:'to_date_time64 inner-expr 3 report-timezone]
+      [:'to_date_time64 inner-expr 3])))
 
-(defmethod sql.qp/unix-timestamp->honeysql [:clickhouse :microseconds]
+(defmethod sql.qp/unix-timestamp->honeysql [:proton :microseconds]
   [_ _ expr]
   (let [report-timezone (get-report-timezone-id-safely)
-        inner-expr      [:'toInt64 (h2x// expr 1000)]]
+        inner-expr      [:'to_int64 (h2x// expr 1000)]]
     (if report-timezone
-      [:'fromUnixTimestamp64Milli inner-expr report-timezone]
-      [:'fromUnixTimestamp64Milli inner-expr])))
+      [:'from_unix_timestamp64_milli inner-expr report-timezone]
+      [:'from_unix_timestamp64_milli inner-expr])))
 
 ;;; ------------------------------------------------------------------------------------
 ;;; HoneySQL forms
 ;;; ------------------------------------------------------------------------------------
 
-(defmethod sql.qp/->honeysql [:clickhouse :convert-timezone]
+(defmethod sql.qp/->honeysql [:proton :convert-timezone]
   [driver [_ arg target-timezone source-timezone]]
   (let [expr          (sql.qp/->honeysql driver (cond-> arg (string? arg) u.date/parse))
         with-tz-info? (h2x/is-of-type? expr #"(?:nullable\(|lowcardinality\()?(datetime64\(\d, {0,1}'.*|datetime\(.*)")
@@ -204,11 +204,11 @@
        expr
        [:'toIntervalSecond
         [:'minus
-         [:'timeZoneOffset [:'toTimeZone expr target-timezone]]
-         [:'timeZoneOffset [:'toTimeZone expr source-timezone]]]]]
-      [:'toTimeZone expr target-timezone])))
+         [:'time_zone_offset [:'to_time_zone expr target-timezone]]
+         [:'time_zone_offset [:'to_time_zone expr source-timezone]]]]]
+      [:'to_time_zone expr target-timezone])))
 
-(defmethod sql.qp/current-datetime-honeysql-form :clickhouse
+(defmethod sql.qp/current-datetime-honeysql-form :proton
   [_]
   (let [report-timezone (get-report-timezone-id-safely)
         [expr db-type]  (if report-timezone
@@ -218,41 +218,41 @@
 
 (defn- date-time-parse-fn
   [nano]
-  (if (zero? nano) :'parseDateTimeBestEffort :'parseDateTime64BestEffort))
+  (if (zero? nano) :'parse_date_time_best_effort :'parse_date_time64_best_effort))
 
-(defmethod sql.qp/->honeysql [:clickhouse LocalDateTime]
+(defmethod sql.qp/->honeysql [:proton LocalDateTime]
   [_ ^java.time.LocalDateTime t]
   (let [formatted (t/format "yyyy-MM-dd HH:mm:ss.SSS" t)]
     (if (zero? (.getNano t))
-      [:'parseDateTimeBestEffort   formatted]
-      [:'parseDateTime64BestEffort formatted 3])))
+      [:'parse_date_time_best_effort   formatted]
+      [:'parse_date_time64_best_effort formatted 3])))
 
-(defmethod sql.qp/->honeysql [:clickhouse ZonedDateTime]
+(defmethod sql.qp/->honeysql [:proton ZonedDateTime]
   [_ ^java.time.ZonedDateTime t]
   (let [formatted (t/format "yyyy-MM-dd HH:mm:ss.SSSZZZZZ" t)
         fn        (date-time-parse-fn (.getNano t))]
     [fn formatted]))
 
-(defmethod sql.qp/->honeysql [:clickhouse OffsetDateTime]
+(defmethod sql.qp/->honeysql [:proton OffsetDateTime]
   [_ ^java.time.OffsetDateTime t]
   ;; copy-paste due to reflection warnings
   (let [formatted (t/format "yyyy-MM-dd HH:mm:ss.SSSZZZZZ" t)
         fn        (date-time-parse-fn (.getNano t))]
     [fn formatted]))
 
-(defmethod sql.qp/->honeysql [:clickhouse LocalDate]
+(defmethod sql.qp/->honeysql [:proton LocalDate]
   [_ ^java.time.LocalDate t]
-  [:'parseDateTimeBestEffort t])
+  [:'parse_date_time_best_effort t])
 
 (defn- local-date-time
   [^java.time.LocalTime t]
   (t/local-date-time (t/local-date 1970 1 1) t))
 
-(defmethod sql.qp/->honeysql [:clickhouse LocalTime]
+(defmethod sql.qp/->honeysql [:proton LocalTime]
   [driver ^java.time.LocalTime t]
   (sql.qp/->honeysql driver (local-date-time t)))
 
-(defmethod sql.qp/->honeysql [:clickhouse OffsetTime]
+(defmethod sql.qp/->honeysql [:proton OffsetTime]
   [driver ^java.time.OffsetTime t]
   (sql.qp/->honeysql driver (t/offset-date-time
                              (local-date-time (.toLocalTime t))
@@ -260,12 +260,12 @@
 
 (defn- args->float64
   [args]
-  (map (fn [arg] [:'toFloat64 (sql.qp/->honeysql :clickhouse arg)]) args))
+  (map (fn [arg] [:'to_float64 (sql.qp/->honeysql :proton arg)]) args))
 
 (defn- interval? [expr]
   (mbql.u/is-clause? :interval expr))
 
-(defmethod sql.qp/->honeysql [:clickhouse :+]
+(defmethod sql.qp/->honeysql [:proton :+]
   [driver [_ & args]]
   (if (some interval? args)
     (if-let [[field intervals] (u/pick-first (complement interval?) args)]
@@ -276,32 +276,32 @@
       (throw (ex-info "Summing intervals is not supported" {:args args})))
     (into [:+] (args->float64 args))))
 
-(defmethod sql.qp/->honeysql [:clickhouse :log]
+(defmethod sql.qp/->honeysql [:proton :log]
   [driver [_ field]]
   [:'log10 (sql.qp/->honeysql driver field)])
 
 (defn- format-expr
   [expr]
-  (first (sql/format-expr (sql.qp/->honeysql :clickhouse expr) {:nested true})))
+  (first (sql/format-expr (sql.qp/->honeysql :proton expr) {:nested true})))
 
-(defmethod sql.qp/->honeysql [:clickhouse :percentile]
+(defmethod sql.qp/->honeysql [:proton :percentile]
   [_ [_ field p]]
   [:raw (format "quantile(%s)(%s)" (format-expr p) (format-expr field))])
 
-(defmethod sql.qp/->honeysql [:clickhouse :regex-match-first]
+(defmethod sql.qp/->honeysql [:proton :regex-match-first]
   [driver [_ arg pattern]]
   [:'extract (sql.qp/->honeysql driver arg) pattern])
 
-(defmethod sql.qp/->honeysql [:clickhouse :stddev]
+(defmethod sql.qp/->honeysql [:proton :stddev]
   [driver [_ field]]
-  [:'stddevPop (sql.qp/->honeysql driver field)])
+  [:'stddev_pop (sql.qp/->honeysql driver field)])
 
-(defmethod sql.qp/->honeysql [:clickhouse :median]
+(defmethod sql.qp/->honeysql [:proton :median]
   [driver [_ field]]
   [:'median (sql.qp/->honeysql driver field)])
 
 ;; Substring does not work for Enums, so we need to cast to String
-(defmethod sql.qp/->honeysql [:clickhouse :substring]
+(defmethod sql.qp/->honeysql [:proton :substring]
   [driver [_ arg start length]]
   (let [str [:'toString (sql.qp/->honeysql driver arg)]]
     (if length
@@ -311,23 +311,23 @@
       [:'substring str
        (sql.qp/->honeysql driver start)])))
 
-(defmethod sql.qp/->honeysql [:clickhouse :var]
+(defmethod sql.qp/->honeysql [:proton :var]
   [driver [_ field]]
-  [:'varPop (sql.qp/->honeysql driver field)])
+  [:'var_pop (sql.qp/->honeysql driver field)])
 
-(defmethod sql.qp/->float :clickhouse
+(defmethod sql.qp/->float :proton
   [_ value]
-  [:'toFloat64 value])
+  [:'to_float64 value])
 
-(defmethod sql.qp/->honeysql [:clickhouse :value]
+(defmethod sql.qp/->honeysql [:proton :value]
   [driver value]
   (let [[_ value {base-type :base_type}] value]
     (when (some? value)
       (condp #(isa? %2 %1) base-type
-        :type/IPAddress [:'toIPv4 value]
+        :type/IPAddress [:'to_ipv4 value]
         (sql.qp/->honeysql driver value)))))
 
-(defmethod sql.qp/->honeysql [:clickhouse :=]
+(defmethod sql.qp/->honeysql [:proton :=]
   [driver [op field value]]
   (let [[qual valuevalue fieldinfo] value
         hsql-field (sql.qp/->honeysql driver field)
@@ -340,7 +340,7 @@
        [:= [:'empty hsql-field] 1]]
       ((get-method sql.qp/->honeysql [:sql :=]) driver [op field value]))))
 
-(defmethod sql.qp/->honeysql [:clickhouse :!=]
+(defmethod sql.qp/->honeysql [:proton :!=]
   [driver [op field value]]
   (let [[qual valuevalue fieldinfo] value
         hsql-field (sql.qp/->honeysql driver field)
@@ -350,7 +350,7 @@
              (nil? valuevalue))
       [:and
        [:!= hsql-field hsql-value]
-       [:= [:'notEmpty hsql-field] 1]]
+       [:= [:'not_empty hsql-field] 1]]
       ((get-method sql.qp/->honeysql [:sql :!=]) driver [op field value]))))
 
 ;; I do not know why the tests expect nil counts for empty results
@@ -360,74 +360,74 @@
 ;;
 ;; metabase.query-processor-test.count-where-test
 ;; metabase.query-processor-test.share-test
-(defmethod sql.qp/->honeysql [:clickhouse :count-where]
+(defmethod sql.qp/->honeysql [:proton :count-where]
   [driver [_ pred]]
   [:case
    [:> [:'count] 0]
    [:sum [:case (sql.qp/->honeysql driver pred) 1 :else 0]]
    :else nil])
 
-(defmethod sql.qp/->honeysql [:clickhouse :sum-where]
+(defmethod sql.qp/->honeysql [:proton :sum-where]
   [driver [_ field pred]]
   [:sum [:case (sql.qp/->honeysql driver pred) (sql.qp/->honeysql driver field)
          :else 0]])
 
-(defmethod sql.qp/add-interval-honeysql-form :clickhouse
+(defmethod sql.qp/add-interval-honeysql-form :proton
   [_ dt amount unit]
   (h2x/+ dt [:raw (format "INTERVAL %d %s" (int amount) (name unit))]))
 
-(defn- clickhouse-string-fn
+(defn- proton-string-fn
   [fn-name field value options]
-  (let [hsql-field (sql.qp/->honeysql :clickhouse field)
-        hsql-value (sql.qp/->honeysql :clickhouse value)]
+  (let [hsql-field (sql.qp/->honeysql :proton field)
+        hsql-value (sql.qp/->honeysql :proton value)]
     (if (get options :case-sensitive true)
       [fn-name hsql-field hsql-value]
-      [fn-name [:'lowerUTF8 hsql-field] [:'lowerUTF8 hsql-value]])))
+      [fn-name [:'lower_utf8 hsql-field] [:'lower_utf8 hsql-value]])))
 
-(defmethod sql.qp/->honeysql [:clickhouse :starts-with]
+(defmethod sql.qp/->honeysql [:proton :starts-with]
   [_ [_ field value options]]
-  (let [starts-with (clickhouse-version/with-min 23 8
-                      (constantly :'startsWithUTF8)
-                      (constantly :'startsWith))]
-    (clickhouse-string-fn starts-with field value options)))
+  (let [starts-with (proton-version/with-min 23 8
+                      (constantly :'starts_with_utf8)
+                      (constantly :'starts_with))]
+    (proton-string-fn starts-with field value options)))
 
-(defmethod sql.qp/->honeysql [:clickhouse :ends-with]
+(defmethod sql.qp/->honeysql [:proton :ends-with]
   [_ [_ field value options]]
-  (let [ends-with (clickhouse-version/with-min 23 8
-                    (constantly :'endsWithUTF8)
-                    (constantly :'endsWith))]
-    (clickhouse-string-fn ends-with field value options)))
+  (let [ends-with (proton-version/with-min 23 8
+                    (constantly :'ends_with_utf8)
+                    (constantly :'ends_with))]
+    (proton-string-fn ends-with field value options)))
 
-(defmethod sql.qp/->honeysql [:clickhouse :contains]
+(defmethod sql.qp/->honeysql [:proton :contains]
   [_ [_ field value options]]
-  (let [hsql-field (sql.qp/->honeysql :clickhouse field)
-        hsql-value (sql.qp/->honeysql :clickhouse value)
+  (let [hsql-field (sql.qp/->honeysql :proton field)
+        hsql-value (sql.qp/->honeysql :proton value)
         position-fn (if (get options :case-sensitive true)
-                      :'positionUTF8
-                      :'positionCaseInsensitiveUTF8)]
+                      :'position_utf8
+                      :'position_case_insensitive_utf8)]
     [:> [position-fn hsql-field hsql-value] 0]))
 
-(defmethod sql.qp/->honeysql [:clickhouse :datetime-diff]
+(defmethod sql.qp/->honeysql [:proton :datetime-diff]
   [driver [_ x y unit]]
   (let [x (sql.qp/->honeysql driver x)
         y (sql.qp/->honeysql driver y)]
     (case unit
       ;; Week: Metabase tests expect a bit different result from what `age` provides
       (:week)
-      [:'intDiv [:'dateDiff (h2x/literal :day) (date-trunc :'toStartOfDay x) (date-trunc :'toStartOfDay y)] [:raw 7]]
+      [:'int_div [:'date_diff (h2x/literal :day) (date-trunc :'to_start_of_day x) (date-trunc :'to_start_of_day y)] [:raw 7]]
       ;; -------------------------
       (:year :month :quarter :day)
-      [:'age (h2x/literal unit) (date-trunc :'toStartOfDay x) (date-trunc :'toStartOfDay y)]
+      [:'age (h2x/literal unit) (date-trunc :'to_start_of_day x) (date-trunc :'to_start_of_day y)]
       ;; -------------------------
       (:hour :minute :second)
       [:'age (h2x/literal unit) (in-report-timezone x) (in-report-timezone y)])))
 
 ;; We do not have Time data types, so we cheat a little bit
-(defmethod sql.qp/cast-temporal-string [:clickhouse :Coercion/ISO8601->Time]
+(defmethod sql.qp/cast-temporal-string [:proton :Coercion/ISO8601->Time]
   [_driver _special_type expr]
-  [:'parseDateTimeBestEffort [:'concat "1970-01-01T" expr]])
+  [:'parse_date_time_best_effort [:'concat "1970-01-01T" expr]])
 
-(defmethod sql.qp/cast-temporal-byte [:clickhouse :Coercion/ISO8601->Time]
+(defmethod sql.qp/cast-temporal-byte [:proton :Coercion/ISO8601->Time]
   [_driver _special_type expr]
   expr)
 
@@ -435,12 +435,12 @@
 ;;; JDBC-related functions
 ;;; ------------------------------------------------------------------------------------
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/TINYINT]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/TINYINT]
   [_ ^ResultSet rs ^ResultSetMetaData _ ^Integer i]
   (fn []
     (.getByte rs i)))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/SMALLINT]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/SMALLINT]
   [_ ^ResultSet rs ^ResultSetMetaData _ ^Integer i]
   (fn []
     (.getShort rs i)))
@@ -452,12 +452,12 @@
   [^ResultSet rs value]
   (if (.wasNull rs) nil value))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/BIGINT]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/BIGINT]
   [_ ^ResultSet rs ^ResultSetMetaData _ ^Integer i]
   (fn []
     (with-null-check rs (.getLong rs i))))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/INTEGER]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/INTEGER]
   [_ ^ResultSet rs ^ResultSetMetaData _ ^Integer i]
   (fn []
     (with-null-check rs (.getInt rs i))))
@@ -493,22 +493,22 @@
       ;; _
       :else (.getObject rs i LocalDateTime))))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/TIMESTAMP]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/TIMESTAMP]
   [_ ^ResultSet rs ^ResultSetMetaData rsmeta ^Integer i]
   (fn []
     (read-timestamp-column rs rsmeta i)))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/TIMESTAMP_WITH_TIMEZONE]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/TIMESTAMP_WITH_TIMEZONE]
   [_ ^ResultSet rs ^ResultSetMetaData rsmeta ^Integer i]
   (fn []
     (read-timestamp-column rs rsmeta i)))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/TIME]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/TIME]
   [_ ^ResultSet rs ^ResultSetMetaData _ ^Integer i]
   (fn []
     (.getObject rs i OffsetTime)))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/NUMERIC]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/NUMERIC]
   [_ ^ResultSet rs ^ResultSetMetaData rsmeta ^Integer i]
   (fn []
     ; count is NUMERIC cause UInt64 is too large for the canonical SQL BIGINT,
@@ -518,7 +518,7 @@
       (.getLong rs i)
       (.getBigDecimal rs i))))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/ARRAY]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/ARRAY]
   [_ ^ResultSet rs ^ResultSetMetaData rsmeta ^Integer i]
   (fn []
     (when-let [arr (.getArray rs i)]
@@ -534,42 +534,42 @@
           (Arrays/toString inner)
           ;; Complex types
           :else
-          (.asString (ClickHouseArrayValue/of inner)))))))
+          (.asString (ProtonArrayValue/of inner)))))))
 
 (defn- ip-column->string
   [^ResultSet rs ^Integer i]
   (when-let [inet-address (.getObject rs i java.net.InetAddress)]
     (.getHostAddress inet-address)))
 
-(defmethod sql-jdbc.execute/read-column-thunk [:clickhouse Types/VARCHAR]
+(defmethod sql-jdbc.execute/read-column-thunk [:proton Types/VARCHAR]
   [_ ^ResultSet rs ^ResultSetMetaData rsmeta ^Integer i]
   (fn []
     (cond
       (str/starts-with? (.getColumnTypeName rsmeta i) "IPv") (ip-column->string rs i)
       :else (.getString rs i))))
 
-(defmethod unprepare/unprepare-value [:clickhouse LocalDate]
+(defmethod unprepare/unprepare-value [:proton LocalDate]
   [_ t]
   (format "'%s'" (t/format "yyyy-MM-dd" t)))
 
-(defmethod unprepare/unprepare-value [:clickhouse LocalTime]
+(defmethod unprepare/unprepare-value [:proton LocalTime]
   [_ t]
   (format "'%s'" (t/format "HH:mm:ss.SSS" t)))
 
-(defmethod unprepare/unprepare-value [:clickhouse OffsetTime]
+(defmethod unprepare/unprepare-value [:proton OffsetTime]
   [_ t]
   (format "'%s'" (t/format "HH:mm:ss.SSSZZZZZ" t)))
 
-(defmethod unprepare/unprepare-value [:clickhouse LocalDateTime]
+(defmethod unprepare/unprepare-value [:proton LocalDateTime]
   [_ t]
   (format "'%s'" (t/format "yyyy-MM-dd HH:mm:ss.SSS" t)))
 
-(defmethod unprepare/unprepare-value [:clickhouse OffsetDateTime]
+(defmethod unprepare/unprepare-value [:proton OffsetDateTime]
   [_ ^OffsetDateTime t]
   (format "%s('%s')"
-          (if (zero? (.getNano t)) "parseDateTimeBestEffort" "parseDateTime64BestEffort")
+          (if (zero? (.getNano t)) "parse_date_time_best_effort" "parse_date_time64_best_effort")
           (t/format "yyyy-MM-dd HH:mm:ss.SSSZZZZZ" t)))
 
-(defmethod unprepare/unprepare-value [:clickhouse ZonedDateTime]
+(defmethod unprepare/unprepare-value [:proton ZonedDateTime]
   [_ t]
   (format "'%s'" (t/format "yyyy-MM-dd HH:mm:ss.SSSZZZZZ" t)))

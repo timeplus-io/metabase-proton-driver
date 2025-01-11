@@ -1,3 +1,8 @@
+s/com.clickhouse./com.timeplus.proton./g
+s/com.timeplus.proton.data.value/com.timeplus.proton.client.data/g
+s/ClickHouse/Proton/g
+s/:clickhouse/:proton/g
+s/clickhouse/proton/g
 s/toMonday/to_monday/g
 s/toStartOfMinute/to_start_of_minute/g
 s/toStartOfHour/to_start_of_hour/g
