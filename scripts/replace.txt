@@ -21,6 +21,7 @@ s/toQuarter/to_quarter/g
 s/toYear/to_year/g
 s/toDateTime64/to_date_time64/g
 s/toInt64/to_int64/g
+s/toInt32/to_int32/g
 s/fromUnixTimestamp64Milli/from_unix_timestamp64_milli/g
 s/toTimeZone/to_time_zone/g
 s/timeZoneOffset/time_zone_offset/g
@@ -40,3 +41,4 @@ s/positionUTF8/position_utf8/g
 s/positionCaseInsensitiveUTF8/position_case_insensitive_utf8/g
 s/intDiv/int_div/g
 s/dateDiff/date_diff/g
+s/splitByChar/split_by_char/g

@@ -16,8 +16,8 @@
 (def ^:private default-cache-ttl (* 60 60 1000))
 
 (def ^:private proton-version-query
-  (str "WITH s AS (SELECT version() AS ver, splitByChar('.', ver) AS verSplit) "
-       "SELECT s.ver, toInt32(verSplit[1]), toInt32(verSplit[2]) FROM s"))
+  (str "WITH s AS (SELECT version() AS ver, split_by_char('.', ver) AS verSplit) "
+       "SELECT s.ver, to_int32(verSplit[1]), to_int32(verSplit[2]) FROM s"))
 
 (def ^:private ^{:arglists '([db-details])} get-proton-version
   (memoize/ttl
