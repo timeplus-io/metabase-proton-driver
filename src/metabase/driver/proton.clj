@@ -277,7 +277,7 @@
 (defmethod driver/database-supports? [:proton :connection-impersonation]
   [_driver _feature db]
   (if db
-    (try (proton-version/is-at-least? 24 4 db)
+    (try (proton-version/is-at-least? 1 5 db)
          (catch Throwable _e
            false))
     false))

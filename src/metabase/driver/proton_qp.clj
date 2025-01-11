@@ -386,14 +386,14 @@
 
 (defmethod sql.qp/->honeysql [:proton :starts-with]
   [_ [_ field value options]]
-  (let [starts-with (proton-version/with-min 23 8
+  (let [starts-with (proton-version/with-min 1 5
                       (constantly :'starts_with_utf8)
                       (constantly :'starts_with))]
     (proton-string-fn starts-with field value options)))
 
 (defmethod sql.qp/->honeysql [:proton :ends-with]
   [_ [_ field value options]]
-  (let [ends-with (proton-version/with-min 23 8
+  (let [ends-with (proton-version/with-min 1 5
                     (constantly :'ends_with_utf8)
                     (constantly :'ends_with))]
     (proton-string-fn ends-with field value options)))
