@@ -6,7 +6,6 @@
             [metabase.config :as config]
             [metabase.driver :as driver]
             [metabase.driver.clickhouse-introspection]
-            [metabase.driver.clickhouse-nippy]
             [metabase.driver.clickhouse-qp]
             [metabase.driver.clickhouse-version :as clickhouse-version]
             [metabase.driver.ddl.interface :as ddl.i]

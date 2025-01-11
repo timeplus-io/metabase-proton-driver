@@ -4,7 +4,6 @@
   (:require [clojure.string :as str]
             [honey.sql :as sql]
             [java-time.api :as t]
-            [metabase.driver.clickhouse-nippy]
             [metabase.driver.clickhouse-version :as clickhouse-version]
             [metabase.driver.sql-jdbc.execute :as sql-jdbc.execute]
             [metabase.driver.sql.query-processor :as sql.qp :refer [add-interval-honeysql-form]]
